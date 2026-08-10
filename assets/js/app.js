@@ -296,7 +296,6 @@
 
   /* ------------------------------------------------------------- carrinho */
 
-  var SHIPPING_THRESHOLD = 99;
   var PKG_PRICE = 9.9;
 
   var cart = $("[data-cart]");
@@ -311,9 +310,6 @@
   var cartCompare = $("[data-cart-compare]");
   var cartTotal = $("[data-cart-total]");
   var cartSave = $("[data-cart-save]");
-  var shipText = $("[data-ship-text]");
-  var shipBar = $("[data-ship-bar]");
-  var shipDots = $$("[data-ship-dot]");
   var pkgBtn = $("[data-pkg]");
   var pkgKnob = $("[data-pkg-knob]");
   var checkoutLink = $("[data-checkout-link]");
@@ -323,24 +319,10 @@
 
   function renderCart() {
     var subtotal = D.price * state.cartQty + (state.pkg ? PKG_PRICE : 0);
-    var remaining = Math.max(0, SHIPPING_THRESHOLD - subtotal);
-    var progress = Math.min(100, (subtotal / SHIPPING_THRESHOLD) * 100);
     var isBlack = state.variant === 0;
 
     cartBadge.textContent = state.cartQty;
     cartLines.textContent = state.cartQty > 0 ? 1 : 0;
-
-    shipText.innerHTML = remaining > 0
-      ? "Faltam " + fmt(remaining) + ' para <span class="font-semibold">Frete Grátis!</span>'
-      : '<span class="font-semibold text-terracotta">Você desbloqueou o frete grátis!</span>';
-
-    shipBar.style.width = progress + "%";
-    shipDots.forEach(function (dot) {
-      var p = Number(dot.getAttribute("data-ship-dot"));
-      var reached = progress >= p;
-      dot.className = "absolute grid h-5 w-5 place-items-center rounded-full text-[10px] " +
-        (reached ? "bg-terracotta text-white" : "bg-rose/30 text-white");
-    });
 
     cartItem.hidden = state.cartQty <= 0;
     cartEmpty.hidden = state.cartQty > 0;
