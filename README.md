@@ -72,9 +72,9 @@ como no projeto original.
 ## Mobile e performance
 
 As imagens foram reencodadas para WebP e redimensionadas para o tamanho real de
-exibição (×2 para telas retina): **4,27 MB → 334 KB, uma redução de 92%**. Os piores
-casos eram `dlk.png` (uma foto salva como PNG, 1,5 MB) e o banner vegano (1,1 MB).
-Uma primeira visita no celular baixa cerca de 137 KB.
+exibição (×2 para telas retina): **8,52 MB → 486 KB, uma redução de 94%**. Os piores
+casos eram `dlk.png` (uma foto salva como PNG, 1,5 MB), `sem_esforco.png` (1,8 MB)
+e o banner vegano (1,1 MB).
 
 Outros ajustes de mobile, todos invisíveis no desktop:
 
@@ -96,17 +96,12 @@ Outros ajustes de mobile, todos invisíveis no desktop:
 
 Verificado sem rolagem horizontal de 320px a 1440px, nas 6 páginas.
 
-## Imagens que faltam
+## Origem das imagens
 
-Três imagens da seção do meio da página ficavam no CDN da Lovable e **não vieram no zip**
-(só os arquivos `.asset.json` que apontavam para elas). Baixe-as do projeto Lovable e
-coloque em `assets/img/` com estes nomes exatos:
-
-- `modo_de_uso.png`
-- `desc1.png`
-- `sem_esforco.png`
-
-Enquanto elas não estiverem lá, aquela seção aparece vazia. O resto da página funciona normalmente.
+Quase todas vieram do zip do projeto Lovable. As três da seção do meio
+(`modo_de_uso`, `desc1`, `sem_esforco`) ficavam só no CDN da Lovable — o zip trazia
+apenas os descritores `.asset.json` apontando para elas — e foram recuperadas à parte.
+Todas estão no repositório em WebP; os PNGs originais não.
 
 ## Como testar localmente
 
