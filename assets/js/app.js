@@ -136,11 +136,9 @@
   /* ---------------------------------------------------------- quantidade */
 
   var qtyValue = $("[data-qty-value]");
-  var ctaPrice = $("[data-cta-price]");
 
   function renderQty() {
     qtyValue.textContent = state.qty;
-    ctaPrice.textContent = fmt(D.price * state.qty);
   }
 
   $$("[data-qty]").forEach(function (btn) {
