@@ -63,7 +63,6 @@
   var state = {
     ann: 0,
     img: 0,
-    qty: 1,
     variant: 0,
     openInfo: 0,
     openFaq: null,
@@ -130,22 +129,6 @@
       renderVariant();
       renderGallery();
       renderCart();
-    });
-  });
-
-  /* ---------------------------------------------------------- quantidade */
-
-  var qtyValue = $("[data-qty-value]");
-
-  function renderQty() {
-    qtyValue.textContent = state.qty;
-  }
-
-  $$("[data-qty]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var delta = Number(btn.getAttribute("data-qty"));
-      state.qty = Math.max(1, state.qty + delta);
-      renderQty();
     });
   });
 
@@ -359,7 +342,9 @@
 
   $$("[data-add-to-cart]").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      state.cartQty = state.qty;
+      // Sem seletor na página: sempre entra 1 unidade. A quantidade é ajustada
+      // dentro da sacola.
+      if (state.cartQty < 1) state.cartQty = 1;
       renderCart();
       openCart();
     });
@@ -508,7 +493,6 @@
   renderAnn();
   renderGallery();
   renderVariant();
-  renderQty();
   renderRating();
   renderCart();
 })();
