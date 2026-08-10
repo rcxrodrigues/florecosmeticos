@@ -119,5 +119,21 @@ mas o formulário de newsletter só responde via `http://`.
 
 ## Publicação
 
-É um site estático — sobe em qualquer lugar sem configuração: Vercel, Netlify,
-Cloudflare Pages, GitHub Pages, Hostinger, cPanel. Basta enviar a pasta inteira.
+O repositório é [rcxrodrigues/florecosmeticos](https://github.com/rcxrodrigues/florecosmeticos)
+e esta pasta é a raiz dele — o que está aqui é exatamente o que vai para o ar.
+
+**Envio automático:** um hook `Stop` em `../.claude/settings.json` roda
+`../.claude/publicar-site.sh` ao fim de cada conversa. Se houver mudança nesta pasta,
+ele faz commit e push sozinho. Sem mudança, não faz nada.
+
+Para publicar à mão a qualquer momento:
+
+```bash
+bash .claude/publicar-site.sh
+```
+
+Para desligar o envio automático, remova o bloco `hooks` de `.claude/settings.json`.
+
+Sendo um site estático, ele sobe em qualquer lugar sem configuração: Vercel, Netlify,
+Cloudflare Pages, GitHub Pages, Hostinger, cPanel. Conectando o repositório a um
+desses serviços, cada push vira um deploy.
