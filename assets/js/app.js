@@ -458,6 +458,69 @@
       });
   });
 
+  /* ------------------------------------------------- diagnóstico na tela */
+
+  /*
+   * Painel de status do rastreamento. Aparece SOMENTE com ?debug no endereço,
+   * então é invisível para quem visita a loja. Serve para conferir GTM e pixel
+   * sem depender do Tag Assistant, do console ou de extensão de navegador.
+   * Usa estilo embutido de propósito: não depende do CSS compilado.
+   */
+  if (/[?&]debug\b/.test(location.search)) {
+    var painel = document.createElement("div");
+    painel.style.cssText =
+      "position:fixed;left:12px;bottom:12px;z-index:99999;max-width:min(92vw,380px);" +
+      "background:#fff;color:#7B3532;border:2px solid #C27C65;border-radius:16px;" +
+      "padding:16px 18px;font:14px/1.5 system-ui,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.18)";
+    document.body.appendChild(painel);
+
+    var linha = function (rotulo, ok, detalhe) {
+      return (
+        '<div style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">' +
+        '<span style="font-size:16px;line-height:1.3">' + (ok ? "✅" : "❌") + "</span>" +
+        "<span><strong>" + rotulo + "</strong>" +
+        (detalhe ? '<br><span style="opacity:.75;font-size:13px">' + detalhe + "</span>" : "") +
+        "</span></div>"
+      );
+    };
+
+    var desenhar = function () {
+      var gtm = Object.keys(window.google_tag_manager || {}).filter(function (k) {
+        return k.indexOf("GTM-") === 0;
+      });
+      var script = !!document.querySelector('script[src*="googletagmanager.com/gtm.js"]');
+      var eventos = (window.dataLayer || [])
+        .map(function (e) { return e && e.event; })
+        .filter(Boolean);
+      var meta = (window.fbq && window.fbq.instance && window.fbq.instance.pixelsByID)
+        ? Object.keys(window.fbq.instance.pixelsByID) : [];
+      var tudoOk = gtm.length > 0 && script && eventos.length >= 3;
+
+      painel.innerHTML =
+        '<div style="font-weight:700;font-size:15px;border-bottom:1px solid #eadfdb;padding-bottom:8px">' +
+        (tudoOk ? "Rastreamento ativo" : "Verificando…") +
+        '<button style="float:right;border:0;background:none;color:#7B3532;font-size:18px;' +
+        'cursor:pointer;line-height:1;padding:0" aria-label="Fechar">×</button></div>' +
+        linha("Script do GTM na página", script, "googletagmanager.com/gtm.js") +
+        linha("Container ativo", gtm.length > 0, gtm.join(", ") || "nenhum") +
+        linha("Eventos disparados", eventos.length >= 3, eventos.join(" · ") || "nenhum") +
+        linha("Pixel da Meta", meta.length > 0, meta.join(", ") || "nenhum") +
+        '<div style="margin-top:12px;padding-top:8px;border-top:1px solid #eadfdb;' +
+        'font-size:12px;opacity:.7">Só aparece com ?debug no endereço. Visitantes não veem.</div>';
+
+      painel.querySelector("button").addEventListener("click", function () {
+        painel.remove();
+      });
+    };
+
+    desenhar();
+    var tentativas = 0;
+    var relogio = setInterval(function () {
+      desenhar();
+      if (++tentativas > 20) clearInterval(relogio);
+    }, 500);
+  }
+
   /* -------------------------------------------------------- render inicial */
 
   renderAnn();
