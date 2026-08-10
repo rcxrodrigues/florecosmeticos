@@ -1,0 +1,14 @@
+# Dependências (o site não usa nenhuma em produção, mas evita acidentes)
+node_modules/
+
+# Segredos — nunca devem ir para o repositório
+.env
+.env.*
+*.pem
+*.key
+
+# Lixo do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
