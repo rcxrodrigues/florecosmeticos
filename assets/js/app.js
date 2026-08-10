@@ -289,7 +289,6 @@
   var cartEmpty = $("[data-cart-empty]");
   var cartThumb = $("[data-cart-thumb]");
   var cartVariant = $("[data-cart-variant]");
-  var cartQtyValue = $("[data-cart-qty-value]");
   var cartCompare = $("[data-cart-compare]");
   var cartTotal = $("[data-cart-total]");
   var cartSave = $("[data-cart-save]");
@@ -312,7 +311,6 @@
 
     cartThumb.src = isBlack ? D.cartThumbs[0] : D.cartThumbs[1];
     cartVariant.textContent = D.colours[state.variant];
-    cartQtyValue.textContent = state.cartQty;
     cartCompare.textContent = fmt(D.compareAt * state.cartQty);
     cartTotal.textContent = fmt(D.price * state.cartQty);
     cartSave.textContent = fmt((D.compareAt - D.price) * state.cartQty);
@@ -353,14 +351,6 @@
   $("[data-cart-open]").addEventListener("click", openCart);
   $("[data-cart-close]").addEventListener("click", closeCart);
   cartBackdrop.addEventListener("click", closeCart);
-
-  $$("[data-cart-qty]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var delta = Number(btn.getAttribute("data-cart-qty"));
-      state.cartQty = Math.max(1, state.cartQty + delta);
-      renderCart();
-    });
-  });
 
   $("[data-cart-remove]").addEventListener("click", function () {
     state.cartQty = 0;
