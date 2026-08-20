@@ -73,6 +73,59 @@
     reviewHover: 0
   };
 
+  /* --------------------------------------- eventos de ecommerce (GA4/GTM) */
+
+  /*
+   * Empurra view_item no formato de ecommerce do GA4 para o dataLayer, de onde
+   * o GTM o lê.
+   *
+   * Só view_item: add_to_cart e begin_checkout já são gerados por tags HTML
+   * personalizadas dentro do próprio container (GTM-MZWT6MJK, versão 12).
+   * Duplicar aqui faria o GA4 contar cada ação duas vezes.
+   *
+   * Frete, pagamento e compra acontecem dentro do checkout do pagou.ai, que não
+   * aceita GTM — ver README.
+   */
+  var PRODUTO = {
+    item_id: "carimbo-delineador-gatinho-perfeito",
+    item_name: "Carimbo de Delineador Gatinho Perfeito",
+    item_brand: "Florè Cosméticos",
+    item_category: "Coleção Olhar Marcante"
+  };
+
+  function itemAtual() {
+    return {
+      item_id: PRODUTO.item_id,
+      item_name: PRODUTO.item_name,
+      item_brand: PRODUTO.item_brand,
+      item_category: PRODUTO.item_category,
+      item_variant: D.colours[state.variant],
+      price: D.price,
+      quantity: 1
+    };
+  }
+
+  var ultimoEnvio = {};
+
+  function evento(nome) {
+    /*
+     * Trava contra envio duplicado. O gatilho de clique em link do GTM segura a
+     * navegação, dispara as tags e redispara o clique — o que faria o listener
+     * rodar de novo e contar a mesma ação duas vezes no GA4.
+     */
+    var agora = Date.now();
+    if (ultimoEnvio[nome] && agora - ultimoEnvio[nome] < 1000) return;
+    ultimoEnvio[nome] = agora;
+
+    window.dataLayer = window.dataLayer || [];
+    // Zera o bloco anterior para os campos não vazarem de um evento ao outro.
+    window.dataLayer.push({ ecommerce: null });
+    window.dataLayer.push({
+      event: nome,
+      ecommerce: { currency: "BRL", value: D.price, items: [itemAtual()] }
+    });
+  }
+
   /* --------------------------------------------------- barra de anúncios */
 
   var annText = $("[data-ann-text]");
@@ -485,4 +538,5 @@
   renderVariant();
   renderRating();
   renderCart();
+  evento("view_item");
 })();
