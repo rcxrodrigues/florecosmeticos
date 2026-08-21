@@ -72,6 +72,12 @@
     window.dataLayer.push({ ecommerce: null });
     window.dataLayer.push({
       event: "purchase",
+      /*
+       * Para o purchase o event_id é o próprio transaction_id: assim o servidor,
+       * que recebe a venda pelo webhook do pagou.ai, chega ao mesmo valor sem
+       * precisar combinar nada com o navegador.
+       */
+      event_id: tx,
       ecommerce: {
         transaction_id: tx,
         value: total,

@@ -108,6 +108,16 @@
     };
   }
 
+  /*
+   * Identificador único por evento. No modelo híbrido (pixel no navegador +
+   * CAPI pelo servidor), a Meta recebe a mesma conversão duas vezes e só sabe
+   * que é a mesma se os dois lados mandarem este mesmo valor. Sem ele, cada
+   * conversão conta em dobro.
+   */
+  function novoEventId(nome) {
+    return nome + "." + Date.now().toString(36) + "." + Math.random().toString(36).slice(2, 8);
+  }
+
   var ultimoEnvio = {};
 
   function evento(nome, qtd) {
@@ -126,6 +136,7 @@
     var n = qtd || 1;
     window.dataLayer.push({
       event: nome,
+      event_id: novoEventId(nome),
       // O documento do GA4 exige value = soma de price x quantity dos itens.
       ecommerce: { currency: "BRL", value: D.price * n, items: [itemAtual(n)] }
     });
