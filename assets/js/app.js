@@ -96,7 +96,7 @@
   // que o GA4, o catálogo da Meta e o Merchant Center usam para casar o produto.
   var SKU = ["1313", "1414"];
 
-  function itemAtual() {
+  function itemAtual(qtd) {
     return {
       item_id: SKU[state.variant],
       item_name: PRODUTO.item_name,
@@ -104,13 +104,13 @@
       item_category: PRODUTO.item_category,
       item_variant: D.colours[state.variant],
       price: D.price,
-      quantity: 1
+      quantity: qtd
     };
   }
 
   var ultimoEnvio = {};
 
-  function evento(nome) {
+  function evento(nome, qtd) {
     /*
      * Trava contra envio duplicado. O gatilho de clique em link do GTM segura a
      * navegação, dispara as tags e redispara o clique — o que faria o listener
@@ -123,9 +123,11 @@
     window.dataLayer = window.dataLayer || [];
     // Zera o bloco anterior para os campos não vazarem de um evento ao outro.
     window.dataLayer.push({ ecommerce: null });
+    var n = qtd || 1;
     window.dataLayer.push({
       event: nome,
-      ecommerce: { currency: "BRL", value: D.price, items: [itemAtual()] }
+      // O documento do GA4 exige value = soma de price x quantity dos itens.
+      ecommerce: { currency: "BRL", value: D.price * n, items: [itemAtual(n)] }
     });
   }
 
@@ -383,6 +385,8 @@
   }
 
   function openCart() {
+    // Sacola vazia não é "visualizar carrinho": sem itens, não há o que reportar.
+    if (state.cartQty > 0) evento("view_cart", state.cartQty);
     cartBackdrop.hidden = false;
     cart.classList.remove("translate-x-full");
     cart.classList.add("translate-x-0");
