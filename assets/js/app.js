@@ -408,6 +408,24 @@
     });
   });
 
+  /*
+   * Antes de mandar o cliente para o pagou.ai, guarda qual variante ele está
+   * comprando. O redirecionamento de volta traz transaction_id e valor, mas não
+   * a cor — a página de obrigado lê isto daqui para montar o item do purchase.
+   */
+  checkoutLink.addEventListener("click", function () {
+    try {
+      window.localStorage.setItem("flore_compra", JSON.stringify({
+        item_id: SKU[state.variant],
+        item_variant: D.colours[state.variant],
+        price: D.price,
+        quantity: state.cartQty || 1
+      }));
+    } catch (e) {
+      // modo privado ou armazenamento cheio: a página de obrigado usa um padrão
+    }
+  });
+
   $("[data-cart-open]").addEventListener("click", openCart);
   $("[data-cart-close]").addEventListener("click", closeCart);
   cartBackdrop.addEventListener("click", closeCart);
