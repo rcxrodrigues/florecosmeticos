@@ -87,15 +87,18 @@
    * aceita GTM — ver README.
    */
   var PRODUTO = {
-    item_id: "carimbo-delineador-gatinho-perfeito",
     item_name: "Carimbo de Delineador Gatinho Perfeito",
     item_brand: "Florè Cosméticos",
     item_category: "Coleção Olhar Marcante"
   };
 
+  // SKU por cor, na mesma ordem de D.colours (Preto, Marrom). É o identificador
+  // que o GA4, o catálogo da Meta e o Merchant Center usam para casar o produto.
+  var SKU = ["1313", "1414"];
+
   function itemAtual() {
     return {
-      item_id: PRODUTO.item_id,
+      item_id: SKU[state.variant],
       item_name: PRODUTO.item_name,
       item_brand: PRODUTO.item_brand,
       item_category: PRODUTO.item_category,
