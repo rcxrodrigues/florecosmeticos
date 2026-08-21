@@ -67,7 +67,6 @@
     openInfo: 0,
     openFaq: null,
     cartQty: 0,
-    pkg: false,
     visibleReviews: 6,
     reviewRating: 5,
     reviewHover: 0
@@ -348,8 +347,6 @@
 
   /* ------------------------------------------------------------- carrinho */
 
-  var PKG_PRICE = 9.9;
-
   var cart = $("[data-cart]");
   var cartBackdrop = $("[data-cart-backdrop]");
   var cartBadge = $("[data-cart-badge]");
@@ -361,15 +358,13 @@
   var cartCompare = $("[data-cart-compare]");
   var cartTotal = $("[data-cart-total]");
   var cartSave = $("[data-cart-save]");
-  var pkgBtn = $("[data-pkg]");
-  var pkgKnob = $("[data-pkg-knob]");
   var checkoutLink = $("[data-checkout-link]");
   var checkoutDisabled = $("[data-checkout-disabled]");
   var checkoutTotal = $("[data-checkout-total]");
   var checkoutTotalDisabled = $("[data-checkout-total-disabled]");
 
   function renderCart() {
-    var subtotal = D.price * state.cartQty + (state.pkg ? PKG_PRICE : 0);
+    var subtotal = D.price * state.cartQty;
     var isBlack = state.variant === 0;
 
     cartBadge.textContent = state.cartQty;
@@ -383,10 +378,6 @@
     cartCompare.textContent = fmt(D.compareAt * state.cartQty);
     cartTotal.textContent = fmt(D.price * state.cartQty);
     cartSave.textContent = fmt((D.compareAt - D.price) * state.cartQty);
-
-    pkgBtn.setAttribute("aria-checked", String(state.pkg));
-    pkgBtn.className = "tap relative h-6 w-11 shrink-0 rounded-full transition " + (state.pkg ? "bg-terracotta" : "bg-border");
-    pkgKnob.className = "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition " + (state.pkg ? "left-[22px]" : "left-0.5");
 
     checkoutTotal.textContent = fmt(subtotal);
     checkoutTotalDisabled.textContent = fmt(subtotal);
@@ -443,11 +434,6 @@
 
   $("[data-cart-remove]").addEventListener("click", function () {
     state.cartQty = 0;
-    renderCart();
-  });
-
-  pkgBtn.addEventListener("click", function () {
-    state.pkg = !state.pkg;
     renderCart();
   });
 
