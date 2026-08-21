@@ -360,11 +360,8 @@
   var cartSave = $("[data-cart-save]");
   var checkoutLink = $("[data-checkout-link]");
   var checkoutDisabled = $("[data-checkout-disabled]");
-  var checkoutTotal = $("[data-checkout-total]");
-  var checkoutTotalDisabled = $("[data-checkout-total-disabled]");
 
   function renderCart() {
-    var subtotal = D.price * state.cartQty;
     var isBlack = state.variant === 0;
 
     cartBadge.textContent = state.cartQty;
@@ -379,8 +376,6 @@
     cartTotal.textContent = fmt(D.price * state.cartQty);
     cartSave.textContent = fmt((D.compareAt - D.price) * state.cartQty);
 
-    checkoutTotal.textContent = fmt(subtotal);
-    checkoutTotalDisabled.textContent = fmt(subtotal);
     checkoutLink.hidden = state.cartQty <= 0;
     checkoutDisabled.hidden = state.cartQty > 0;
     checkoutLink.href = withUtms(isBlack ? D.checkout.black : D.checkout.brown);
