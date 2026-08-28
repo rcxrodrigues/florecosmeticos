@@ -86,6 +86,23 @@
       }
     });
 
+    /*
+     * Mesmo evento no Pixel, com eventID = transaction_id. O servidor recebe a
+     * venda pelo webhook do pagou.ai e chega a esse mesmo id, entao a Meta pareia
+     * navegador e CAPI sem contar duas vezes.
+     */
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "Purchase", {
+        content_ids: [item.item_id],
+        content_type: "product",
+        content_name: item.item_name,
+        contents: [{ id: item.item_id, quantity: item.quantity }],
+        num_items: item.quantity,
+        value: total,
+        currency: "BRL"
+      }, { eventID: tx });
+    }
+
     marcarComoEnviada(tx);
     try { window.localStorage.removeItem("flore_compra"); } catch (e) {}
     return "enviado";

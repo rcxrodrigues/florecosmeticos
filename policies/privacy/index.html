@@ -30,8 +30,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
 
 
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+/* Identificador do PageView, exposto para o RRTrack usar o mesmo na CAPI. */
+window.FLORE_PIXELS = ['725883016488191', '810228857963239'];
+window.FLORE_PAGEVIEW_ID = 'PageView.' + Date.now().toString(36) + '.' +
+  Math.random().toString(36).slice(2, 8);
+
+window.FLORE_PIXELS.forEach(function (id) { fbq('init', id); });
+fbq('track', 'PageView', {}, { eventID: window.FLORE_PAGEVIEW_ID });
+
+window.dataLayer = window.dataLayer || [];
+window.dataLayer.push({ event: 'meta_page_view', event_id: window.FLORE_PAGEVIEW_ID });
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=725883016488191&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 <!-- RRTrack · florecomesticos.store -->
-<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://rr-track.vercel.app/rr/collect",viewContentOnLoad:true,product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
+<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://rr-track.vercel.app/rr/collect",viewContentOnLoad:false,product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
 <script src="https://rr-track.vercel.app/rr.js" async></script>
 <!-- End RRTrack -->
 </head>

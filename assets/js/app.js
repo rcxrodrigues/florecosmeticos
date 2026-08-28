@@ -117,6 +117,57 @@
     return nome + "." + Date.now().toString(36) + "." + Math.random().toString(36).slice(2, 8);
   }
 
+  /*
+   * Espelha o evento no Pixel da Meta com o MESMO event_id que vai ao dataLayer.
+   * O RRTrack manda o par pela CAPI lendo esse id — e a Meta, vendo o mesmo
+   * identificador nos dois lados, conta uma vez só.
+   *
+   * view_cart nao tem equivalente padrao na Meta, entao fica de fora.
+   */
+  var EVENTO_META = {
+    view_item: "ViewContent",
+    add_to_cart: "AddToCart",
+    begin_checkout: "InitiateCheckout"
+  };
+
+  /*
+   * Observa o dataLayer e espelha no Pixel. Precisa ser assim, e nao uma chamada
+   * dentro de evento(): add_to_cart e begin_checkout sao empurrados por tags do
+   * GTM, que nao passam pelo nosso codigo. Lendo do dataLayer, cobrimos os dois
+   * caminhos com o mesmo event_id que ja esta no push.
+   */
+  var jaEspelhado = {};
+
+  function espelharNoPixel(entrada) {
+    if (!entrada || typeof window.fbq !== "function") return;
+    var nomeMeta = EVENTO_META[entrada.event];
+    if (!nomeMeta || !entrada.event_id) return;
+    /*
+     * Trava por event_id: o GTM reprocessa o dataLayer e a mesma entrada chega
+     * aqui mais de uma vez. Sem isto, cada acao vira dois eventos no Pixel.
+     */
+    if (jaEspelhado[entrada.event_id]) return;
+    jaEspelhado[entrada.event_id] = true;
+    var ec = entrada.ecommerce || {};
+    var item = (ec.items && ec.items[0]) || {};
+    window.fbq("track", nomeMeta, {
+      content_ids: [item.item_id],
+      content_type: "product",
+      content_name: item.item_name,
+      contents: [{ id: item.item_id, quantity: item.quantity || 1 }],
+      value: ec.value,
+      currency: ec.currency || "BRL"
+    }, { eventID: entrada.event_id });
+  }
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.forEach(espelharNoPixel);          // o que ja passou
+  var pushOriginal = window.dataLayer.push;
+  window.dataLayer.push = function () {
+    for (var i = 0; i < arguments.length; i++) espelharNoPixel(arguments[i]);
+    return pushOriginal.apply(this, arguments);
+  };
+
   var ultimoEnvio = {};
 
   function evento(nome, qtd) {
@@ -133,9 +184,10 @@
     // Zera o bloco anterior para os campos não vazarem de um evento ao outro.
     window.dataLayer.push({ ecommerce: null });
     var n = qtd || 1;
+    var id = novoEventId(nome);
     window.dataLayer.push({
       event: nome,
-      event_id: novoEventId(nome),
+      event_id: id,
       // O documento do GA4 exige value = soma de price x quantity dos itens.
       ecommerce: { currency: "BRL", value: D.price * n, items: [itemAtual(n)] }
     });
