@@ -482,7 +482,14 @@
 
     checkoutLink.hidden = state.cartQty <= 0;
     checkoutDisabled.hidden = state.cartQty > 0;
-    checkoutLink.href = withUtms(isBlack ? D.checkout.black : D.checkout.brown);
+    /*
+     * O decorate do rr.js carimba o clickId (sck) no link, e e por ele que a
+     * venda encontra o anuncio quando o webhook do gateway volta. Como esta
+     * linha reescreve o href a cada render, o carimbo precisa ser reaplicado
+     * aqui — senao ele e apagado e a atribuicao se perde.
+     */
+    var destino = withUtms(isBlack ? D.checkout.black : D.checkout.brown);
+    checkoutLink.href = typeof window.rr === "function" ? window.rr("decorate", destino) : destino;
   }
 
   function openCart() {
