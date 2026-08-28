@@ -72,18 +72,18 @@
     reviewHover: 0
   };
 
-  /* --------------------------------------- eventos de ecommerce (GA4/GTM) */
+  /* ------------------------------------------ eventos de ecommerce */
 
   /*
-   * Empurra view_item no formato de ecommerce do GA4 para o dataLayer, de onde
-   * o GTM o lê.
+   * Os eventos vão para o dataLayer no formato de ecommerce do GA4 e são lidos
+   * por dois consumidores: o RRTrack (que envia server-side) e o espelho do
+   * Pixel da Meta mais abaixo neste arquivo.
    *
-   * Só view_item: add_to_cart e begin_checkout já são gerados por tags HTML
-   * personalizadas dentro do próprio container (GTM-MZWT6MJK, versão 12).
-   * Duplicar aqui faria o GA4 contar cada ação duas vezes.
+   * O formato do GA4 foi mantido por ser o vocabulário padrão de ecommerce —
+   * currency, value e items[] — mesmo sem GTM na página.
    *
-   * Frete, pagamento e compra acontecem dentro do checkout do pagou.ai, que não
-   * aceita GTM — ver README.
+   * add_payment_info e add_shipping_info acontecem dentro do checkout do
+   * pagou.ai e não têm como ser capturados daqui.
    */
   var PRODUTO = {
     item_name: "Carimbo de Delineador Gatinho Perfeito",
@@ -464,6 +464,7 @@
       // Sem seletor na página: sempre entra 1 unidade. A quantidade é ajustada
       // dentro da sacola.
       if (state.cartQty < 1) state.cartQty = 1;
+      evento("add_to_cart");
       renderCart();
       openCart();
     });
@@ -475,6 +476,7 @@
    * a cor — a página de obrigado lê isto daqui para montar o item do purchase.
    */
   checkoutLink.addEventListener("click", function () {
+    evento("begin_checkout");
     try {
       window.localStorage.setItem("flore_compra", JSON.stringify({
         item_id: SKU[state.variant],
@@ -576,26 +578,23 @@
     };
 
     var desenhar = function () {
-      var gtm = Object.keys(window.google_tag_manager || {}).filter(function (k) {
-        return k.indexOf("GTM-") === 0;
-      });
-      var script = !!document.querySelector('script[src*="googletagmanager.com/gtm.js"]');
       var eventos = (window.dataLayer || [])
         .map(function (e) { return e && e.event; })
         .filter(Boolean);
       var meta = (window.fbq && window.fbq.instance && window.fbq.instance.pixelsByID)
         ? Object.keys(window.fbq.instance.pixelsByID) : [];
-      var tudoOk = gtm.length > 0 && script && eventos.length >= 3;
+      var rr = typeof window.rr === "function";
+      var produto = rr ? window.rr("product") : null;
+      var tudoOk = meta.length > 0 && rr && eventos.length >= 2;
 
       painel.innerHTML =
         '<div style="font-weight:700;font-size:15px;border-bottom:1px solid #eadfdb;padding-bottom:8px">' +
         (tudoOk ? "Rastreamento ativo" : "Verificando…") +
         '<button style="float:right;border:0;background:none;color:#7B3532;font-size:18px;' +
         'cursor:pointer;line-height:1;padding:0" aria-label="Fechar">×</button></div>' +
-        linha("Script do GTM na página", script, "googletagmanager.com/gtm.js") +
-        linha("Container ativo", gtm.length > 0, gtm.join(", ") || "nenhum") +
-        linha("Eventos disparados", eventos.length >= 3, eventos.join(" · ") || "nenhum") +
-        linha("Pixel da Meta", meta.length > 0, meta.join(", ") || "nenhum") +
+        linha("Pixel da Meta", meta.length > 0, meta.join(" · ") || "nenhum") +
+        linha("RRTrack", rr, produto ? "produto " + produto.id + " · R$ " + produto.price : "não carregou") +
+        linha("Eventos no dataLayer", eventos.length >= 2, eventos.join(" · ") || "nenhum") +
         '<div style="margin-top:12px;padding-top:8px;border-top:1px solid #eadfdb;' +
         'font-size:12px;opacity:.7">Só aparece com ?debug no endereço. Visitantes não veem.</div>';
 
