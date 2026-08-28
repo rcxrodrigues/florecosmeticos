@@ -197,6 +197,18 @@
       renderVariant();
       renderGallery();
       renderCart();
+      /*
+       * Avisa o RRTrack do SKU escolhido. Tem de ser via setProduct: o script le
+       * window.RRTrackConfig.product uma unica vez no carregamento e guarda, entao
+       * alterar aquele objeto depois nao teria efeito.
+       */
+      if (typeof window.rr === "function") {
+        window.rr("setProduct", {
+          id: SKU[state.variant],
+          name: PRODUTO.item_name + " — " + D.colours[state.variant],
+          price: D.price
+        });
+      }
     });
   });
 
