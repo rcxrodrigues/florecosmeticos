@@ -37,7 +37,7 @@ window.FLORE_PAGEVIEW_ID = 'PageView.' + Date.now().toString(36) + '.' +
   Math.random().toString(36).slice(2, 8);
 
 window.FLORE_PIXELS.forEach(function (id) { fbq('init', id); });
-fbq('track', 'PageView', {}, { eventID: window.FLORE_PAGEVIEW_ID });
+/* PageView fica por conta do RRTrack (server-side) — ver README. */
 
 window.dataLayer = window.dataLayer || [];
 window.dataLayer.push({ event: 'meta_page_view', event_id: window.FLORE_PAGEVIEW_ID });
@@ -46,7 +46,7 @@ window.dataLayer.push({ event: 'meta_page_view', event_id: window.FLORE_PAGEVIEW
 src="https://www.facebook.com/tr?id=725883016488191&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
 <!-- RRTrack · florecomesticos.store -->
-<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://t.florecomesticos.store/rr/collect",viewContentOnLoad:false,product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
+<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://t.florecomesticos.store/rr/collect",viewContentOnLoad:false,addToCartSelector:"[data-rr-desligado]",product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
 <script src="https://t.florecomesticos.store/rr.js" async></script>
 <!-- End RRTrack -->
 </head>

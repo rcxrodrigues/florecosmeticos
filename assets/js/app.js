@@ -138,6 +138,41 @@
    */
   var jaEspelhado = {};
 
+  /*
+   * Mapa para o vocabulario do RRTrack, que difere do nosso em um nome.
+   */
+  var EVENTO_RR = {
+    view_item: "view_content",
+    add_to_cart: "add_to_cart",
+    begin_checkout: "begin_checkout"
+  };
+
+  /*
+   * Manda o MESMO evento e o MESMO event_id ao RRTrack, que repassa pela CAPI.
+   *
+   * O rr.js dispararia esses eventos sozinho, por clique — mas com id proprio,
+   * e a Meta so deduplica quando navegador e servidor mandam identificadores
+   * iguais. Por isso o auto-disparo dele foi desligado no <head> e o envio
+   * passa por aqui.
+   */
+  function espelharNoRRTrack(entrada) {
+    if (!entrada || typeof window.rr !== "function") return;
+    var nomeRR = EVENTO_RR[entrada.event];
+    if (!nomeRR || !entrada.event_id) return;
+    var ec = entrada.ecommerce || {};
+    var item = (ec.items && ec.items[0]) || {};
+    window.rr("track", nomeRR, {
+      currency: ec.currency || "BRL",
+      value: ec.value,
+      items: [{
+        item_id: item.item_id,
+        item_name: item.item_name,
+        price: item.price,
+        quantity: item.quantity || 1
+      }]
+    }, entrada.event_id);
+  }
+
   function espelharNoPixel(entrada) {
     if (!entrada || typeof window.fbq !== "function") return;
     var nomeMeta = EVENTO_META[entrada.event];
@@ -161,10 +196,15 @@
   }
 
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.forEach(espelharNoPixel);          // o que ja passou
+  function espelhar(entrada) {
+    espelharNoPixel(entrada);
+    espelharNoRRTrack(entrada);
+  }
+
+  window.dataLayer.forEach(espelhar);                 // o que ja passou
   var pushOriginal = window.dataLayer.push;
   window.dataLayer.push = function () {
-    for (var i = 0; i < arguments.length; i++) espelharNoPixel(arguments[i]);
+    for (var i = 0; i < arguments.length; i++) espelhar(arguments[i]);
     return pushOriginal.apply(this, arguments);
   };
 

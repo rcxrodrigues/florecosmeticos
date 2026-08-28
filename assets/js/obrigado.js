@@ -103,6 +103,21 @@
       }, { eventID: tx });
     }
 
+    /* Mesmo evento e mesmo id ao RRTrack, que repassa pela CAPI. */
+    if (typeof window.rr === "function") {
+      window.rr("track", "purchase", {
+        currency: "BRL",
+        value: total,
+        transaction_id: tx,
+        items: [{
+          item_id: item.item_id,
+          item_name: item.item_name,
+          price: item.price,
+          quantity: item.quantity
+        }]
+      }, tx);
+    }
+
     marcarComoEnviada(tx);
     try { window.localStorage.removeItem("flore_compra"); } catch (e) {}
     return "enviado";

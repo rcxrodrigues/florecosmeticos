@@ -51,7 +51,7 @@ window.FLORE_PAGEVIEW_ID = 'PageView.' + Date.now().toString(36) + '.' +
   Math.random().toString(36).slice(2, 8);
 
 window.FLORE_PIXELS.forEach(function (id) { fbq('init', id); });
-fbq('track', 'PageView', {}, { eventID: window.FLORE_PAGEVIEW_ID });
+/* PageView fica por conta do RRTrack (server-side) — ver README. */
 
 window.dataLayer = window.dataLayer || [];
 window.dataLayer.push({ event: 'meta_page_view', event_id: window.FLORE_PAGEVIEW_ID });
@@ -60,7 +60,7 @@ window.dataLayer.push({ event: 'meta_page_view', event_id: window.FLORE_PAGEVIEW
 src="https://www.facebook.com/tr?id=725883016488191&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
 <!-- RRTrack · florecomesticos.store -->
-<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://t.florecomesticos.store/rr/collect",viewContentOnLoad:false,product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
+<script>window.RRTrackConfig={siteKey:"pk_8b1cece65fc9ba21f4f014b6",endpoint:"https://t.florecomesticos.store/rr/collect",viewContentOnLoad:false,addToCartSelector:"[data-rr-desligado]",product:{id:"1313",name:"Carimbo de Delineador Gatinho Perfeito",price:29.90}}</script>
 <script src="https://t.florecomesticos.store/rr.js" async></script>
 <!-- End RRTrack -->
 </head>
@@ -624,7 +624,7 @@ src="https://www.facebook.com/tr?id=725883016488191&ev=PageView&noscript=1"/></n
 
   <div class="border-t border-border">
     <div class="px-5 py-4">
-      <a href="#" class="block w-full rounded-full bg-[#E6957F] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:opacity-95" data-checkout-link hidden>FINALIZAR COMPRA</a>
+      <a href="#" class="block w-full rounded-full bg-[#E6957F] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:opacity-95" data-checkout-link data-rr-ic="1" hidden>FINALIZAR COMPRA</a>
       <button class="w-full rounded-full bg-[#E6957F] px-6 py-4 text-sm font-semibold uppercase tracking-[0.14em] text-white opacity-60" disabled data-checkout-disabled>FINALIZAR COMPRA</button>
       <div class="mt-3 flex justify-center">
         <img src="assets/img/payment-icons-transparent.png" alt="Formas de pagamento" class="h-5 w-auto opacity-90" width="500" height="45" loading="lazy" decoding="async">
