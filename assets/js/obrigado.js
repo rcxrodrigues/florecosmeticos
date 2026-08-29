@@ -87,23 +87,14 @@
     });
 
     /*
-     * Mesmo evento no Pixel, com eventID = transaction_id. O servidor recebe a
-     * venda pelo webhook do pagou.ai e chega a esse mesmo id, entao a Meta pareia
-     * navegador e CAPI sem contar duas vezes.
+     * Um envio so, para o rr.js — e ele dispara o pixel e a CAPI com este
+     * mesmo id. O transaction_id do gateway e o identificador: o webhook do
+     * pagou.ai chega ao servidor com ele, entao os dois lados se encontram sem
+     * precisar combinar nada.
+     *
+     * Havia aqui uma chamada direta ao fbq. Ela virou duplicata no dia em que
+     * o rr.js passou a disparar o pixel — mesma compra, dois Purchase.
      */
-    if (typeof window.fbq === "function") {
-      window.fbq("track", "Purchase", {
-        content_ids: [item.item_id],
-        content_type: "product",
-        content_name: item.item_name,
-        contents: [{ id: item.item_id, quantity: item.quantity }],
-        num_items: item.quantity,
-        value: total,
-        currency: "BRL"
-      }, { eventID: tx });
-    }
-
-    /* Mesmo evento e mesmo id ao RRTrack, que repassa pela CAPI. */
     if (typeof window.rr === "function") {
       window.rr("track", "purchase", {
         currency: "BRL",

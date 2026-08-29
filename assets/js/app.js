@@ -118,95 +118,17 @@
   }
 
   /*
-   * Espelha o evento no Pixel da Meta com o MESMO event_id que vai ao dataLayer.
-   * O RRTrack manda o par pela CAPI lendo esse id — e a Meta, vendo o mesmo
-   * identificador nos dois lados, conta uma vez só.
+   * O dataLayer continua, mas agora ele NAO alimenta a Meta.
    *
-   * view_cart nao tem equivalente padrao na Meta, entao fica de fora.
-   */
-  var EVENTO_META = {
-    view_item: "ViewContent",
-    add_to_cart: "AddToCart",
-    begin_checkout: "InitiateCheckout"
-  };
-
-  /*
-   * Observa o dataLayer e espelha no Pixel. Precisa ser assim, e nao uma chamada
-   * dentro de evento(): add_to_cart e begin_checkout sao empurrados por tags do
-   * GTM, que nao passam pelo nosso codigo. Lendo do dataLayer, cobrimos os dois
-   * caminhos com o mesmo event_id que ja esta no push.
-   */
-  var jaEspelhado = {};
-
-  /*
-   * Mapa para o vocabulario do RRTrack, que difere do nosso em um nome.
-   */
-  var EVENTO_RR = {
-    view_item: "view_content",
-    add_to_cart: "add_to_cart",
-    begin_checkout: "begin_checkout"
-  };
-
-  /*
-   * Manda o MESMO evento e o MESMO event_id ao RRTrack, que repassa pela CAPI.
+   * Quem dispara o pixel e manda para a CAPI e o rr.js, com um event_id so
+   * para os dois lados. Enquanto este arquivo tambem disparava, existiam dois
+   * geradores de identificador e bastava uma diferenca de configuracao para a
+   * mesma conversao ser contada duas vezes — sem erro em lugar nenhum.
    *
-   * O rr.js dispararia esses eventos sozinho, por clique — mas com id proprio,
-   * e a Meta so deduplica quando navegador e servidor mandam identificadores
-   * iguais. Por isso o auto-disparo dele foi desligado no <head> e o envio
-   * passa por aqui.
+   * O que sobrou aqui e a camada de dados da propria loja, util no dia em que
+   * entrar um GA4 ou qualquer outra ferramenta que leia dataLayer.
    */
-  function espelharNoRRTrack(entrada) {
-    if (!entrada || typeof window.rr !== "function") return;
-    var nomeRR = EVENTO_RR[entrada.event];
-    if (!nomeRR || !entrada.event_id) return;
-    var ec = entrada.ecommerce || {};
-    var item = (ec.items && ec.items[0]) || {};
-    window.rr("track", nomeRR, {
-      currency: ec.currency || "BRL",
-      value: ec.value,
-      items: [{
-        item_id: item.item_id,
-        item_name: item.item_name,
-        price: item.price,
-        quantity: item.quantity || 1
-      }]
-    }, entrada.event_id);
-  }
-
-  function espelharNoPixel(entrada) {
-    if (!entrada || typeof window.fbq !== "function") return;
-    var nomeMeta = EVENTO_META[entrada.event];
-    if (!nomeMeta || !entrada.event_id) return;
-    /*
-     * Trava por event_id: o GTM reprocessa o dataLayer e a mesma entrada chega
-     * aqui mais de uma vez. Sem isto, cada acao vira dois eventos no Pixel.
-     */
-    if (jaEspelhado[entrada.event_id]) return;
-    jaEspelhado[entrada.event_id] = true;
-    var ec = entrada.ecommerce || {};
-    var item = (ec.items && ec.items[0]) || {};
-    window.fbq("track", nomeMeta, {
-      content_ids: [item.item_id],
-      content_type: "product",
-      content_name: item.item_name,
-      contents: [{ id: item.item_id, quantity: item.quantity || 1 }],
-      value: ec.value,
-      currency: ec.currency || "BRL"
-    }, { eventID: entrada.event_id });
-  }
-
   window.dataLayer = window.dataLayer || [];
-  function espelhar(entrada) {
-    espelharNoPixel(entrada);
-    espelharNoRRTrack(entrada);
-  }
-
-  window.dataLayer.forEach(espelhar);                 // o que ja passou
-  var pushOriginal = window.dataLayer.push;
-  window.dataLayer.push = function () {
-    for (var i = 0; i < arguments.length; i++) espelhar(arguments[i]);
-    return pushOriginal.apply(this, arguments);
-  };
 
   var ultimoEnvio = {};
 
